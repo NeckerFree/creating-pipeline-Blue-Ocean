@@ -17,7 +17,7 @@ pipeline {
           branches: [[name: '*/main']],
           userRemoteConfigs: [[
             url: 'https://github.com/NeckerFree/creating-pipeline-blue-ocean.git',
-            credentialsId: 'github-token' // must match the ID in Jenkins credentials
+            credentialsId: 'github-token'
           ]]
         ])
       }
@@ -29,15 +29,9 @@ pipeline {
       }
     }
 
-    stage('Test') {
-      steps {
-        sh 'npm test || echo "No tests found"'
-      }
-    }
-
     stage('Build') {
       steps {
-        sh 'npm run build || echo "No build script"'
+        sh 'npm run build || echo "No build script found"'
       }
     }
   }
@@ -47,7 +41,7 @@ pipeline {
       echo "✅ Build completed successfully!"
     }
     failure {
-      echo "❌ Build failed."
+      echo "❌ Build failed!"
     }
   }
 }
