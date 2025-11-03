@@ -1,28 +1,37 @@
 pipeline {
     agent {
         docker {
-            image 'node:6-alpine'
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // no -p to avoid port conflicts
+            image 'node:20-alpine'
+            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
         }
+    }
+    environment {
+        // Use your GitHub credential ID here
+        GIT_CREDENTIALS = 'github-elio'
     }
     stages {
         stage('Checkout') {
             steps {
-                // Checkout using GitHub credentials
-                checkout([$class: 'GitSCM',
+                checkout([
+                    $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     doGenerateSubmoduleConfigurations: false,
                     extensions: [],
                     userRemoteConfigs: [[
                         url: 'https://github.com/NeckerFree/creating-pipeline-blue-ocean.git',
-                        credentialsId: 'github-elio'
+                        credentialsId: "${GIT_CREDENTIALS}"
                     ]]
                 ])
             }
         }
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'npm run build'  // optional, if your project has a build script
             }
         }
     }
